@@ -1,9 +1,7 @@
 import { BoardType, TileType, TileReducerAction } from "../types";
 import { DEFAULT_BOARD } from "../constants";
 
-
 const boardReducer = (boardData: BoardType, action: TileReducerAction): BoardType => {
-
     switch (action.type) {
         case "add": {
             const { width, height } = action;

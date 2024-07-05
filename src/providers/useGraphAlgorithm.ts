@@ -1,7 +1,8 @@
 import { TilePos, TileType, GraphType, Comparator, TileKey } from "../types";
 import { PriorityQueue } from "./PriorityQueue";
 import { useAppContext } from "../useContextHook";
-import { createFactory } from "./HeurestricProvider";
+import { createFactory } from "./HeuristricProvider";
+import { ALGORITHM_TYPE_LIST } from "../constants";
 
 type T = [number, string];
 
@@ -61,6 +62,20 @@ export const generateGraph = (board: TileType[][]): GraphType => {
 export const usePathFindingAlgorithm = () => {
     const { boardDispatch, boardData, algorithmName, heuristicName } = useAppContext();
     const factory = createFactory();
+
+    const getHeuresticConstantValue = (name: (typeof ALGORITHM_TYPE_LIST)[number] | "") => {
+        switch (name) {
+            case "Dijkstra":
+                return 0;
+            case "A*":
+                return 1;
+            case "Greedy BFS":
+                return 1;
+            default:
+                return 0;
+        }
+    };
+
     const handleTileColorChange = async (tile: TilePos, field: TileKey, newValue: TileType[TileKey]) => {
         const { pos_x, pos_y } = tile;
         if (isValidField(pos_x, pos_y, boardData.start) && isValidField(pos_x, pos_y, boardData.end)) {
@@ -72,6 +87,16 @@ export const usePathFindingAlgorithm = () => {
                 newValue: newValue,
             });
             await delay(50);
+        }
+    };
+
+    const handleColoringPath = async (path: string[], exists: boolean) => {
+        for (let i = 0; i < path.length; i++) {
+            if (!exists) {
+                break;
+            }
+            const JSONItem = JSON.parse(path[i]);
+            await handleTileColorChange(JSONItem, "type", "path");
         }
     };
 
@@ -92,27 +117,15 @@ export const usePathFindingAlgorithm = () => {
         return [path.reverse(), path.length > 0];
     };
 
-    const getHeuresticConstantValue = (name: string) => {
-        switch (name) {
-            case "Dijkstra":
-                return 0;
-            case "A*":
-                return 1;
-            case "Greedy BFS":
-                return 1;
-            default:
-                return 0;
-        }
-    };
+    const findPath = (prev: Map<string, string>): [string[], boolean] => {
+        const path: string[] = [];
+        let currItem = JSON.stringify(boardData.end);
 
-    const handleColoringPath = async (path: string[], exists: boolean) => {
-        for (let i = 0; i < path.length; i++) {
-            if (!exists) {
-                break;
-            }
-            const JSONItem = JSON.parse(path[i]);
-            await handleTileColorChange(JSONItem, "type", "path");
+        while (prev.has(currItem)) {
+            path.push(currItem);
+            currItem = prev.get(currItem)!;
         }
+        return [path.reverse(), path.length > 0];
     };
 
     const pathFindingAlgorithm = async (graph: GraphType, start: TilePos, end: TilePos) => {
@@ -122,7 +135,7 @@ export const usePathFindingAlgorithm = () => {
         const prev = new Map<string, string>();
         const pq = new PriorityQueue<T>([], TileComparator);
         const heuresticConst = getHeuresticConstantValue(algorithmName);
-        const heurestic = factory.getHeurestic(heuristicName);
+        const heurestic = factory.getHeuristic(heuristicName);
         console.log(heuristicName, heuresticConst, heurestic);
         for (const key of graphKeys) {
             distances.set(key, Infinity);
@@ -172,7 +185,7 @@ export const usePathFindingAlgorithm = () => {
         console.log("Prev ", prev);
         console.log("Path: ", path);
         await handleColoringPath(path, exists);
-        alert("Finish");
+        exists ? alert("Finish") : alert(`Path doesn't exists`);
     };
 
     const greedyBFSAlgorith = async (graph: GraphType, start: TilePos, end: TilePos) => {
@@ -180,7 +193,7 @@ export const usePathFindingAlgorithm = () => {
         const prev = new Map<string, string>();
         const pq = new PriorityQueue<[number, string]>([], TileComparator);
         const heuresticConst = getHeuresticConstantValue(algorithmName);
-        const heurestic = factory.getHeurestic(heuristicName);
+        const heurestic = factory.getHeuristic(heuristicName);
         pq.insertValue([heuresticConst * heurestic(start, end), JSON.stringify(start)]);
 
         while (!pq.isEmpty()) {
@@ -212,18 +225,7 @@ export const usePathFindingAlgorithm = () => {
         console.log("Prev ", prev);
         console.log("Path: ", path);
         await handleColoringPath(path, exists);
-        alert("Finish");
-    };
-
-    const findPath = (prev: Map<string, string>): [string[], boolean] => {
-        const path: string[] = [];
-        let currItem = JSON.stringify(boardData.end);
-
-        while (prev.has(currItem)) {
-            path.push(currItem);
-            currItem = prev.get(currItem)!;
-        }
-        return [path.reverse(), path.length > 0];
+        exists ? alert("Finish") : alert(`Path doesn't exists`);
     };
 
     if (algorithmName === "Dijkstra" || algorithmName === "A*") {

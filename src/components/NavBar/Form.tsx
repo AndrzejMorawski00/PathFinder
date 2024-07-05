@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useAppContext } from "../../useContextHook";
 
+import { MIN_BOARD_WIDTH, MAX_BOARD_WIDTH, MIN_BOARD_HEIGHT, MAX_BOARD_HEIGHT } from "../../constants";
+import { printMessages } from "../../misc";
+
 const INITIAL_FORM_DATA = {
     width: "",
     height: "",
@@ -11,8 +14,8 @@ type FormDataType = {
     height: string;
 };
 
-const validateBoardSize = (width: number, height: number) => {
-    return +width > 1 && +width < 100 && +height > 1 && +height < 100;
+const validateBoardSide = (size: number, minVal: number, maxVal: number) => {
+    return size >= minVal && size <= maxVal;
 };
 
 const Form = () => {
@@ -24,11 +27,24 @@ const Form = () => {
     };
 
     const handleFormSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
-        const { width, height } = formData;
         e.preventDefault();
-        if (validateBoardSize(+width, +height)) {
-            boardDispatch({ type: "add", width: +width, height: +height });
-            setFormData(INITIAL_FORM_DATA);
+        const { width, height } = formData;
+        const messages: string[] = [];
+        if (!validateBoardSide(+width, MIN_BOARD_WIDTH, MAX_BOARD_WIDTH)) {
+            messages.push(`Board width must be in [${MIN_BOARD_WIDTH},${MAX_BOARD_WIDTH}] range`);
+        }
+        if (!validateBoardSide(+height, MIN_BOARD_HEIGHT, MAX_BOARD_HEIGHT)) {
+            messages.push(`Board height must be in [${MIN_BOARD_HEIGHT},${MAX_BOARD_HEIGHT}] range`);
+        }
+
+        if (messages.length) {
+            printMessages(messages);
+        } else {
+            boardDispatch({
+                type: "add",
+                width: +width,
+                height: +height,
+            });
         }
     };
 
