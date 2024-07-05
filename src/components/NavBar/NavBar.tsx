@@ -1,51 +1,57 @@
 import { useAppContext } from "../../useContextHook";
 import Form from "./Form";
 
-import {
-    // generateGraph,
-    // useDijkstraAlgorithm,
-    // useAStarAlgorithm,
-    // useGreedyBFSAlgorithm,
-} from "../../providers/useGraphAlgorithm";
+import { FIELD_TYPE_LIST } from "../../constants";
 
-import {
-    generateGraph,
-    useDijkstraAlgorithm,
-    useGreedyBFSAlgorithm,
-    useAStarAlgorithm,
-} from "../../providers/newGraph";
+import { generateGraph, usePathFindingAlgorithm } from "../../providers/useGraphAlgorithm";
 
+type FieldType = (typeof FIELD_TYPE_LIST)[number];
 const NavBar = () => {
-    const { boardData } = useAppContext();
-    const dijkstraAlgorithm = useAStarAlgorithm();
+    const { boardData, boardDispatch } = useAppContext();
+    const algorithm = usePathFindingAlgorithm();
+    const resetBoardList = [3, 4];
+    const clearBoardList = [2, 3, 4];
 
-    const handleStartClickv2 = () => {
-        console.clear();
-        const graph = generateGraph(boardData.board);
-        dijkstraAlgorithm(graph, boardData.start, boardData.end);
+    const checkInputData = () => {
+        return true;
     };
 
-    // const aStarAlgorithm = useAStarAlgorithm();
-    // const handleStartClickv1 = () => {
-    //     console.clear();
-    //     const graph = generateGraph(boardData.board);
-    //     aStarAlgorithm(graph, boardData.start, boardData.end);
-    // };
+    const handleAlgorithmStart = () => {
+        if (checkInputData()) {
+            console.clear();
+            const graph = generateGraph(boardData.board);
+            algorithm(graph, boardData.start, boardData.end);
+        } else {
+            alert("Invalid InputData");
+        }
+    };
 
-    // const greedyBFS = useGreedyBFSAlgorithm;
-    // const handleStartClickv3 = () => {
-    //     console.clear();
-    //     const graph = generateGraph(boardData.board);
-    //     greedyBFS(graph, boardData.start, boardData.end);
-    // };
+    const handleBoardReset = (tiles: FieldType[]) => {
+        boardData.board.forEach((row) => {
+            row.forEach((tile) => {
+                if (tiles.find((elem) => elem === tile.type) !== undefined) {
+                    boardDispatch({
+                        type: "changeTile",
+                        pos_x: tile.pos.pos_x,
+                        pos_y: tile.pos.pos_y,
+                        field: "type",
+                        newValue: "",
+                    });
+                }
+            });
+        });
+    };
 
     return (
         <div>
             <div>
-                {/* <button onClick={handleStartClickv1}>Start A*</button> */}
-                <button onClick={handleStartClickv2}>Start Dijkstra</button>
-                {/* <button onClick={handleStartClickv3}>Start BFS</button> */}
-                <button>Clear Board</button>
+                <button onClick={handleAlgorithmStart}>Start Algorithm</button>
+                <button onClick={() => handleBoardReset(Array.from(resetBoardList, (index) => FIELD_TYPE_LIST[index]))}>
+                    Reset Board
+                </button>
+                <button onClick={() => handleBoardReset(Array.from(clearBoardList, (index) => FIELD_TYPE_LIST[index]))}>
+                    Clear Board
+                </button>
             </div>
             <Form />
         </div>

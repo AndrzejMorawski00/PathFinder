@@ -1,22 +1,16 @@
-import { ALGORITHM_LIST, FIELD_TYPE } from "../../constants";
+import { FIELD_TYPE_LIST } from "../../constants";
 import { useMainContext } from "../../useContextHook";
+
+import AlgorithmSelector from "./AlgorithmSelector";
 
 const Header = () => {
     const { fieldType, handleFieldTypeChange } = useMainContext();
+    const avaliavbleFieldTypes = [0, 1, 2];
     return (
         <div className="header">
-            <form>
-                <label htmlFor="algorithm">Select an algorithm:</label>
-                <select name="algorithm" id="algorithm">
-                    {ALGORITHM_LIST.map((alg, idx) => (
-                        <option key={idx} value={alg}>
-                            {alg}
-                        </option>
-                    ))}
-                </select>
-            </form>
+            <AlgorithmSelector />
             <div className="header-field">
-                {FIELD_TYPE.map((field, idx) => (
+                {Array.from(avaliavbleFieldTypes, (idx) => FIELD_TYPE_LIST[idx]).map((field, idx) => (
                     <button
                         className={fieldType === field ? "selected-field" : ""}
                         key={idx}

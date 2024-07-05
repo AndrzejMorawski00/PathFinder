@@ -10,8 +10,24 @@ export const DEFAULT_BOARD: BoardType = {
         pos_x: -1,
         pos_y: -1,
     },
-    graph: new Map(),
 };
 
-export const ALGORITHM_LIST = ["", `Dijkstra's algorithm`, "A* search algorithm"];
-export const FIELD_TYPE = ["start", "end", "obstacle", "visited", 'path'] as const;
+export const ALGORITHM_TYPE_LIST = [`Dijkstra`, "A*", "Greedy BFS"] as const;
+export const FIELD_TYPE_LIST = ["start", "end", "obstacle", "visited", "path"] as const;
+
+export const AlgorithmHeuristics = new Map<string, { default: string; list: string[] }>();
+
+AlgorithmHeuristics.set("Dijkstra", {
+    default: "zero",
+    list: [],
+});
+
+AlgorithmHeuristics.set("A*", {
+    default: "one",
+    list: ["Manhattan Distance", "Euclidean Distance", "Weighted Manhattan Distance"],
+});
+
+AlgorithmHeuristics.set("Greedy BFS", {
+    default: "one",
+    list: ["Manhattan Distance", "Euclidean Distance", "Weighted Manhattan Distance"],
+});

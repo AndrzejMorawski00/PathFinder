@@ -13,8 +13,10 @@ import "./main.css";
 export interface IAppContext {
     boardData: BoardType;
     boardDispatch: Dispatch<TileReducerAction>;
-    algorithm: string;
+    algorithmName: string;
     handleAlgorithmChange: (newAlgorithm: string) => void;
+    heuristicName: string;
+    handleHeuristicChange: (newAlgorithm: string) => void;
 }
 
 export const AppContext = createContext<IAppContext | undefined>(undefined);
@@ -22,16 +24,22 @@ export const AppContext = createContext<IAppContext | undefined>(undefined);
 function App() {
     const [boardData, boardDispatch] = useReducer(boardReducer, DEFAULT_BOARD);
     const [algorithm, setAlgorithm] = useState("");
-
+    const [heuristic, setHeuristic] = useState("");
     const handleAlgorithmChange = (newAlgorithm: string) => {
         setAlgorithm(newAlgorithm);
+    };
+
+    const handleHeuristicChange = (newAlgorithm: string) => {
+        setHeuristic(newAlgorithm);
     };
 
     const appContext = {
         boardData: boardData,
         boardDispatch: boardDispatch,
-        algorithm: algorithm,
+        algorithmName: algorithm,
         handleAlgorithmChange: handleAlgorithmChange,
+        heuristicName: heuristic,
+        handleHeuristicChange: handleHeuristicChange,
     };
 
     return (

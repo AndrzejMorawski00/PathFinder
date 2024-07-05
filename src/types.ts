@@ -1,6 +1,6 @@
-import { FIELD_TYPE } from "./constants";
+import { FIELD_TYPE_LIST } from "./constants";
 
-export type TileTypes = (typeof FIELD_TYPE)[number] | "";
+export type TileTypes = (typeof FIELD_TYPE_LIST)[number] | "";
 
 export type TileType = {
     pos: TilePos;
@@ -11,15 +11,12 @@ export type BoardType = {
     board: TileType[][];
     start: TilePos;
     end: TilePos;
-    graph: GraphType;
 };
 
 export type TilePos = {
     pos_x: number;
     pos_y: number;
 };
-
-export type GraphType = Map<string, TilePos[]>;
 
 export type TileKey = Exclude<keyof TileType, "TilePos">;
 export type StartEndKey = Exclude<keyof BoardType, "board" | "graph">;

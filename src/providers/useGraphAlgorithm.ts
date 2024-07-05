@@ -1,25 +1,23 @@
-import { TilePos, TileType, GraphType, Comparator } from "../types";
-
+import { TilePos, TileType, GraphType, Comparator, TileKey } from "../types";
 import { PriorityQueue } from "./PriorityQueue";
-
 import { useAppContext } from "../useContextHook";
+import { createFactory } from "./HeurestricProvider";
 
-const TileComparator: Comparator<[number, string]> = (a: [number, string], b: [number, string]) => {
+type T = [number, string];
+
+const TileComparator: Comparator<T> = (a: T, b: T): boolean => {
     return a[0] < b[0];
 };
 
 const isValidMove = (field: number, minVal: number, maxVal: number) => {
-    return minVal <= field && field <= maxVal;
+    return minVal < field && field < maxVal;
 };
 
 const isValidField = (pos_x: number, pos_y: number, field: TilePos) => {
     return !(pos_x == field.pos_x && pos_y == field.pos_y);
 };
 
-const delay = (ms: number) =>
-    new Promise((resolve) => {
-        setTimeout(resolve, ms);
-    });
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const generateGraph = (board: TileType[][]): GraphType => {
     const moves = [
@@ -43,8 +41,8 @@ export const generateGraph = (board: TileType[][]): GraphType => {
                         pos_y: currPos.pos_y + move[0],
                     };
                     if (
-                        isValidMove(neighbor.pos_x, 0, board.length - 1) &&
-                        isValidMove(neighbor.pos_y, 0, board[i].length - 1) &&
+                        isValidMove(neighbor.pos_x, -1, board.length) &&
+                        isValidMove(neighbor.pos_y, -1, board[i].length) &&
                         board[neighbor.pos_y][neighbor.pos_x].type !== "obstacle"
                     ) {
                         const currList = graphMap.get(JSONPos);
@@ -60,147 +58,72 @@ export const generateGraph = (board: TileType[][]): GraphType => {
     return graphMap;
 };
 
-export const useDijkstraAlgorithm = () => {
-    const { boardDispatch, boardData } = useAppContext();
-    const dijkstraAlgorithm = async (graph: GraphType, start: TilePos, end: TilePos) => {
-        let graphKeys = Array.from(graph.keys());
-        const distances = new Map<string, number>();
-        const visited = new Set<string>();
-        const prev = new Map<string, string>();
-        const pq = new PriorityQueue<[number, string]>([], TileComparator);
-
-        for (const key of graphKeys) {
-            distances.set(key, Infinity);
-            prev.set(key, "");
+export const usePathFindingAlgorithm = () => {
+    const { boardDispatch, boardData, algorithmName, heuristicName } = useAppContext();
+    const factory = createFactory();
+    const handleTileColorChange = async (tile: TilePos, field: TileKey, newValue: TileType[TileKey]) => {
+        const { pos_x, pos_y } = tile;
+        if (isValidField(pos_x, pos_y, boardData.start) && isValidField(pos_x, pos_y, boardData.end)) {
+            boardDispatch({
+                type: "changeTile",
+                pos_x: pos_x,
+                pos_y: pos_y,
+                field: field,
+                newValue: newValue,
+            });
+            await delay(50);
         }
+    };
 
-        distances.set(JSON.stringify(start), 0);
-        pq.insertValue([0, JSON.stringify(start)]);
-
-        while (!pq.isEmpty()) {
-            const [minVal, item] = pq.getHead();
-            if (visited.has(item)) {
-                continue;
-            }
-
-            visited.add(item);
-            const JSONItem: TilePos = JSON.parse(item);
-            if (
-                isValidField(JSONItem.pos_x, JSONItem.pos_y, boardData.start) &&
-                isValidField(JSONItem.pos_x, JSONItem.pos_y, boardData.end)
-            ) {
-                boardDispatch({
-                    type: "changeTile",
-                    pos_x: JSONItem.pos_x,
-                    pos_y: JSONItem.pos_y,
-                    field: "type",
-                    newValue: "visited",
-                });
-                await delay(50);
-            }
-            let itemDistance = distances.get(item);
-            if (itemDistance === undefined) {
-                itemDistance = Infinity;
-            }
-            // czy to jest potrzebne?
-            if (itemDistance < minVal) {
-                continue;
-            }
-            const neighbors = graph.get(item) || [];
-            for (const neighbor of neighbors) {
-                const JSONNeighbor = JSON.stringify(neighbor);
-                if (visited.has(JSONNeighbor)) {
-                    continue;
-                }
-                let currDistance = distances.get(item);
-                if (currDistance === undefined) {
-                    currDistance = Infinity;
-                }
-                let newDistance = currDistance + 1;
-
-                if (newDistance < (distances.get(JSONNeighbor) || Infinity)) {
-                    distances.set(JSONNeighbor, newDistance);
-                    prev.set(JSONNeighbor, item);
-                    pq.insertValue([newDistance, JSONNeighbor]);
-                }
-            }
-
-            if (item === JSON.stringify(end)) {
+    const findShortestPath = (prev: Map<string, string>, distances: Map<string, number>): [string[], boolean] => {
+        const path: string[] = [];
+        let currItem = JSON.stringify(boardData.end);
+        while (true) {
+            if (distances.get(currItem) === undefined || distances.get(currItem) === Infinity) {
                 break;
             }
+            let nextItem = prev.get(currItem);
+            if (nextItem === undefined || nextItem === "") {
+                break;
+            }
+            path.push(nextItem);
+            currItem = nextItem;
         }
-        const [path, exists] = findShortestPath(prev, distances);
-        console.log("Path Lenght: ", path.length);
-        console.log("Distances: ", distances);
-        console.log("Prev ", prev);
-        console.log("Path: ", path);
+        return [path.reverse(), path.length > 0];
+    };
 
+    const getHeuresticConstantValue = (name: string) => {
+        switch (name) {
+            case "Dijkstra":
+                return 0;
+            case "A*":
+                return 1;
+            case "Greedy BFS":
+                return 1;
+            default:
+                return 0;
+        }
+    };
+
+    const handleColoringPath = async (path: string[], exists: boolean) => {
         for (let i = 0; i < path.length; i++) {
             if (!exists) {
                 break;
             }
             const JSONItem = JSON.parse(path[i]);
-            if (i !== 0 && i !== path.length - 1) {
-                boardDispatch({
-                    type: "changeTile",
-                    pos_x: JSONItem.pos_x,
-                    pos_y: JSONItem.pos_y,
-                    field: "type",
-                    newValue: "path",
-                });
-                await delay(50);
-            }
+            await handleTileColorChange(JSONItem, "type", "path");
         }
-        alert("Finish");
     };
 
-    const findShortestPath = (prev: Map<string, string>, distances: Map<string, number>): [string[], boolean] => {
-        const path: string[] = [];
-        let exists = false;
-        let currItem = JSON.stringify(boardData.end);
-        if (distances.get(currItem) === undefined || distances.get(currItem) === Infinity) {
-            return [path, false];
-        }
-        path.push(currItem);
-        console.log(path);
-        while (true) {
-            let nextItem = prev.get(currItem);
-            if (nextItem === undefined || nextItem === "") {
-                break;
-            } else {
-                path.push(nextItem);
-            }
-            currItem = nextItem;
-        }
-        if (path[path.length - 1] === JSON.stringify(boardData.start)) {
-            exists = true;
-        }
-        return [path.reverse(), exists];
-    };
-    // Algorytm nie zawsze się kończy, dlaczego?
-
-    return dijkstraAlgorithm;
-};
-
-export const useAStarAlgorithm = () => {
-    const { boardDispatch, boardData } = useAppContext();
-
-    const manhattanDistance = (pos1: TilePos, pos2: TilePos, constantValue: number): number => {
-        return Math.abs(pos1.pos_x - pos2.pos_x) + Math.abs(pos1.pos_y - pos2.pos_y);
-        // return constantValue * Math.sqrt(Math.pow(pos1.pos_x - pos2.pos_x, 2) + Math.pow(pos1.pos_y - pos2.pos_y, 2));
-    };
-
-    const euclideanDistance = (pos1: TilePos, pos2: TilePos): number => {
-        return Math.sqrt(Math.pow(pos1.pos_x - pos2.pos_x, 2) + Math.pow(pos1.pos_y - pos2.pos_y, 2));
-    };
-
-    const aStarAlgorithm = async (graph: GraphType, start: TilePos, end: TilePos) => {
+    const pathFindingAlgorithm = async (graph: GraphType, start: TilePos, end: TilePos) => {
         let graphKeys = Array.from(graph.keys());
         const distances = new Map<string, number>();
         const visited = new Set<string>();
         const prev = new Map<string, string>();
-        const pq = new PriorityQueue<[number, string]>([], TileComparator);
-
+        const pq = new PriorityQueue<T>([], TileComparator);
+        const heuresticConst = getHeuresticConstantValue(algorithmName);
+        const heurestic = factory.getHeurestic(heuristicName);
+        console.log(heuristicName, heuresticConst, heurestic);
         for (const key of graphKeys) {
             distances.set(key, Infinity);
             prev.set(key, "");
@@ -217,286 +140,94 @@ export const useAStarAlgorithm = () => {
 
             visited.add(item);
             const JSONItem: TilePos = JSON.parse(item);
-            if (
-                isValidField(JSONItem.pos_x, JSONItem.pos_y, boardData.start) &&
-                isValidField(JSONItem.pos_x, JSONItem.pos_y, boardData.end)
-            ) {
-                boardDispatch({
-                    type: "changeTile",
-                    pos_x: JSONItem.pos_x,
-                    pos_y: JSONItem.pos_y,
-                    field: "type",
-                    newValue: "visited",
-                });
-                await delay(50);
-            }
-            let itemDistance = distances.get(item);
-            if (itemDistance === undefined) {
-                itemDistance = Infinity;
-            }
-            // czy to jest potrzebne?
-            // if (itemDistance < minVal) {
-            //     continue;
-            // }
+            await handleTileColorChange(JSONItem, "type", "visited");
+
             const neighbors = graph.get(item) || [];
             for (const neighbor of neighbors) {
                 const JSONNeighbor = JSON.stringify(neighbor);
                 if (visited.has(JSONNeighbor)) {
                     continue;
                 }
+
                 let currDistance = distances.get(item);
                 if (currDistance === undefined) {
                     currDistance = Infinity;
                 }
                 let newDistance = currDistance + 1;
-                const heuristic = manhattanDistance(neighbor, end, 1);
+                const heuresticValue = heuresticConst * heurestic(neighbor, end);
                 if (newDistance < (distances.get(JSONNeighbor) || Infinity)) {
                     distances.set(JSONNeighbor, newDistance);
                     prev.set(JSONNeighbor, item);
-                    pq.insertValue([newDistance + heuristic, JSONNeighbor]);
+                    pq.insertValue([newDistance + heuresticValue, JSONNeighbor]);
                 }
             }
-
             if (item === JSON.stringify(end)) {
                 break;
             }
         }
         const [path, exists] = findShortestPath(prev, distances);
+        console.log(graph);
         console.log("Path Lenght: ", path.length);
         console.log("Distances: ", distances);
         console.log("Prev ", prev);
         console.log("Path: ", path);
-
-        for (let i = 0; i < path.length; i++) {
-            if (!exists) {
-                break;
-            }
-            const JSONItem = JSON.parse(path[i]);
-            if (i !== 0 && i !== path.length - 1) {
-                boardDispatch({
-                    type: "changeTile",
-                    pos_x: JSONItem.pos_x,
-                    pos_y: JSONItem.pos_y,
-                    field: "type",
-                    newValue: "path",
-                });
-                await delay(50);
-            }
-        }
+        await handleColoringPath(path, exists);
         alert("Finish");
     };
 
-    // Helper function to find the shortest path from the `prev` map
-
-    // const aStarAlgorithm = async (graph: GraphType, start: TilePos, end: TilePos) => {
-    //     const distances = new Map<string, number>();
-    //     const visited = new Set<string>();
-    //     const prev = new Map<string, string>();
-    //     const pq = new PriorityQueue<[number, string]>([], TileComparator);
-
-    //     const startKey = JSON.stringify(start);
-    //     const endKey = JSON.stringify(end);
-
-    //     for (const key of graph.keys()) {
-    //         distances.set(key, Infinity);
-    //         prev.set(key, "");
-    //     }
-
-    //     distances.set(startKey, 0);
-    //     pq.insertValue([0, startKey]);
-
-    //     while (!pq.isEmpty()) {
-    //         const [_, item] = pq.getHead();
-
-    //         if (visited.has(item)) {
-    //             continue;
-    //         }
-
-    //         visited.add(item);
-    //         const JSONItem: TilePos = JSON.parse(item);
-
-    //         if (
-    //             isValidField(JSONItem.pos_x, JSONItem.pos_y, boardData.start) &&
-    //             isValidField(JSONItem.pos_x, JSONItem.pos_y, boardData.end)
-    //         ) {
-    //             boardDispatch({
-    //                 type: "changeTile",
-    //                 pos_x: JSONItem.pos_x,
-    //                 pos_y: JSONItem.pos_y,
-    //                 field: "type",
-    //                 newValue: "visited",
-    //             });
-    //             await delay(50);
-    //         }
-
-    //         if (item === endKey) {
-    //             break;
-    //         }
-
-    //         let itemDistance = distances.get(item);
-    //         if (itemDistance === undefined) {
-    //             itemDistance = Infinity;
-    //         }
-
-    //         const neighbors = graph.get(item) || [];
-    //         for (const neighbor of neighbors) {
-    //             const neighborKey = JSON.stringify(neighbor);
-    //             if (visited.has(neighborKey)) {
-    //                 continue;
-    //             }
-
-    //             const newDistance = itemDistance + 1;
-    //             const heuristic = manhattanDistance(neighbor, end);
-
-    //             if (newDistance < (distances.get(neighborKey) || Infinity)) {
-    //                 distances.set(neighborKey, newDistance);
-    //                 prev.set(neighborKey, item);
-    //                 pq.insertValue([newDistance + heuristic, neighborKey]);
-    //             }
-    //         }
-    //     }
-
-    //     const [path, exists] = findShortestPath(prev, distances, startKey, endKey);
-    //     console.log("Distances: ", distances);
-    //     console.log("Prev: ", prev);
-    //     console.log("Path: ", path);
-
-    //     for (let i = 0; i < path.length; i++) {
-    //         if (!exists) {
-    //             break;
-    //         }
-    //         const JSONItem = JSON.parse(path[i]);
-    //         if (i !== 0 && i !== path.length - 1) {
-    //             boardDispatch({
-    //                 type: "changeTile",
-    //                 pos_x: JSONItem.pos_x,
-    //                 pos_y: JSONItem.pos_y,
-    //                 field: "type",
-    //                 newValue: "path",
-    //             });
-    //             await delay(50);
-    //         }
-    //     }
-    //     alert("Finish");
-    // };
-
-    const findShortestPath = (prev: Map<string, string>, distances: Map<string, number>): [string[], boolean] => {
-        const path: string[] = [];
-        let exists = false;
-        let currItem = JSON.stringify(boardData.end);
-        if (distances.get(currItem) === undefined || distances.get(currItem) === Infinity) {
-            return [path, false];
-        }
-        path.push(currItem);
-        console.log(path);
-        while (true) {
-            let nextItem = prev.get(currItem);
-            if (nextItem === undefined || nextItem === "") {
-                break;
-            } else {
-                path.push(nextItem);
-            }
-            currItem = nextItem;
-        }
-        if (path[path.length - 1] === JSON.stringify(boardData.start)) {
-            exists = true;
-        }
-        return [path.reverse(), exists];
-    };
-
-    return aStarAlgorithm;
-};
-
-export const useGreedyBFSAlgorithm = () => {
-    const weightedManhattanDistance = (pos1: TilePos, pos2: TilePos): number => {
-        const dx = Math.abs(pos1.pos_x - pos2.pos_x);
-        const dy = Math.abs(pos1.pos_y - pos2.pos_y);
-        const D = 1; // Cost for moving in the same row/column
-        const D2 = 1.4; // Cost for moving diagonally
-        return D * (dx + dy) + (D2 - 2 * D) * Math.min(dx, dy);
-    };
-
-    const { boardDispatch, boardData } = useAppContext();
-    const greedyBFS = async (graph: GraphType, start: TilePos, end: TilePos) => {
+    const greedyBFSAlgorith = async (graph: GraphType, start: TilePos, end: TilePos) => {
         const visited = new Set<string>();
         const prev = new Map<string, string>();
         const pq = new PriorityQueue<[number, string]>([], TileComparator);
-
-        pq.insertValue([weightedManhattanDistance(start, end), JSON.stringify(start)]);
+        const heuresticConst = getHeuresticConstantValue(algorithmName);
+        const heurestic = factory.getHeurestic(heuristicName);
+        pq.insertValue([heuresticConst * heurestic(start, end), JSON.stringify(start)]);
 
         while (!pq.isEmpty()) {
             const [_, item] = pq.getHead();
             if (visited.has(item)) {
                 continue;
             }
-
             visited.add(item);
             const JSONItem: TilePos = JSON.parse(item);
-
-            if (
-                isValidField(JSONItem.pos_x, JSONItem.pos_y, boardData.start) &&
-                isValidField(JSONItem.pos_x, JSONItem.pos_y, boardData.end)
-            ) {
-                boardDispatch({
-                    type: "changeTile",
-                    pos_x: JSONItem.pos_x,
-                    pos_y: JSONItem.pos_y,
-                    field: "type",
-                    newValue: "visited",
-                });
-                await delay(50);
-            }
-
-            if (item === JSON.stringify(end)) {
-                break;
-            }
+            await handleTileColorChange(JSONItem, "type", "visited");
 
             const neighbors = graph.get(item) || [];
-
             for (const neighbor of neighbors) {
                 const JSONNeighbor = JSON.stringify(neighbor);
                 if (visited.has(JSONNeighbor)) {
                     continue;
                 }
                 prev.set(JSONNeighbor, item);
-                const heuristic = weightedManhattanDistance(neighbor, end);
-                pq.insertValue([heuristic, JSONNeighbor]);
+                const heuristicValue = heuresticConst * heurestic(neighbor, end);
+                pq.insertValue([heuristicValue, JSONNeighbor]);
             }
-        }
-        const [path, exists] = findShortestPathv1(prev);
-        console.log("Path Length: ", path.length + 1);
-        console.log("Prev ", prev);
-        console.log("Path: ", path);
-
-        for (let i = 0; i < path.length; i++) {
-            if (!exists) {
+            if (item === JSON.stringify(end)) {
                 break;
             }
-            const JSONItem = JSON.parse(path[i]);
-            if (i !== 0 && i !== path.length - 1) {
-                boardDispatch({
-                    type: "changeTile",
-                    pos_x: JSONItem.pos_x,
-                    pos_y: JSONItem.pos_y,
-                    field: "type",
-                    newValue: "path",
-                });
-                await delay(50);
-            }
         }
+        const [path, exists] = findPath(prev);
+        console.log(graph);
+        console.log("Path Lenght: ", path.length);
+        console.log("Prev ", prev);
+        console.log("Path: ", path);
+        await handleColoringPath(path, exists);
         alert("Finish");
-        function findShortestPathv1(prev: Map<string, string>): [string[], boolean] {
-            const path: string[] = [];
-            let current = JSON.stringify(end);
-            while (prev.has(current)) {
-                path.push(current);
-                current = prev.get(current)!;
-            }
-            path.push(JSON.stringify(start));
-            path.reverse();
-            return [path, path.length > 1];
-        }
     };
 
-    return greedyBFS;
+    const findPath = (prev: Map<string, string>): [string[], boolean] => {
+        const path: string[] = [];
+        let currItem = JSON.stringify(boardData.end);
+
+        while (prev.has(currItem)) {
+            path.push(currItem);
+            currItem = prev.get(currItem)!;
+        }
+        return [path.reverse(), path.length > 0];
+    };
+
+    if (algorithmName === "Dijkstra" || algorithmName === "A*") {
+        return pathFindingAlgorithm;
+    }
+    return greedyBFSAlgorith;
 };
