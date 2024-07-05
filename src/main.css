@@ -1,0 +1,38 @@
+.main {
+    display: flex;
+    flex-direction: row;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.header-field {
+    display: flex;
+}
+
+.selected-field {
+    background-color: rgba(200, 0, 0, 0.5);
+}
+
+.start {
+    background-color: rgba(0, 255, 0, 0.9);
+}
+
+.end {
+    background-color: rgba(255, 0, 0.9);
+}
+
+.obstacle {
+    background-color: rgba(100, 100, 100, 0.9);
+}
+
+.visited {
+    background-color: rgb(238, 236, 106);
+}
+
+.path {
+    background-color: aqua;
+}
