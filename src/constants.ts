@@ -1,5 +1,10 @@
 import { BoardType } from "./types";
 
+export const MIN_BOARD_WIDTH = 3;
+export const MAX_BOARD_WIDTH = 100;
+export const MIN_BOARD_HEIGHT = 3;
+export const MAX_BOARD_HEIGHT = 100;
+
 export const DEFAULT_BOARD: BoardType = {
     board: [],
     start: {
@@ -31,8 +36,3 @@ AlgorithmHeuristics.set("Greedy BFS", {
     default: "one",
     list: ["Manhattan Distance", "Euclidean Distance", "Weighted Manhattan Distance"],
 });
-
-export const MIN_BOARD_WIDTH = 3;
-export const MAX_BOARD_WIDTH = 100;
-export const MIN_BOARD_HEIGHT = 3;
-export const MAX_BOARD_HEIGHT = 100;

@@ -54,6 +54,7 @@ const boardReducer = (boardData: BoardType, action: TileReducerAction): BoardTyp
             });
             return { ...boardData, board: boardTiles };
         }
+
         case "delete": {
             return DEFAULT_BOARD;
         }
