@@ -1,28 +1,14 @@
 import { StartEndKey, TileKey, TileType, TileTypes } from "../../types";
 import { useAppContext, useMainContext } from "../../useContextHook";
+import { getClassName } from "../../utils/BoardTile";
 
-const Board = () => {
-    const { boardData } = useAppContext();
-    return (
-        <div className="flex flex-col flex-1 w-full h-full">
-            {boardData.board.map((row, idx) => (
-                <div key={idx} className="flex flex-row flex-1 w-full">
-                    {row.map((tile, idx) => (
-                        <BoardTile key={idx} tile={tile} />
-                    ))}
-                </div>
-            ))}
-        </div>
-    );
-};
-
-interface IBoardTile {
+interface Props {
     tile: TileType;
 }
 
-const BoardTile = ({ tile }: IBoardTile) => {
+const BoardTile = ({ tile }: Props) => {
     const { pos, type } = tile; // CurrentTileData (position and type)
-    const { boardData, boardDispatch } = useAppContext(); // Board Data And BoardDispatch
+    const { boardData, boardDispatch } = useAppContext();
     const { fieldType } = useMainContext(); // selected FieldType from header to replace old value
 
     const updateStartEndField = (key: StartEndKey, new_x: number, new_y: number) => {
@@ -68,24 +54,9 @@ const BoardTile = ({ tile }: IBoardTile) => {
         }
     };
 
-    const getClassName = (): string => {
-        switch (type) {
-            case "start":
-                return "bg-green-500";
-            case "end":
-                return "bg-red-500";
-            case "obstacle":
-                return "bg-gray-500";
-            case "visited":
-                return "bg-yellow-300";
-            case "path":
-                return "bg-blue-500";
-            default:
-                return "bg-gray-200";
-        }
-    };
-
-    return <button onClick={handleTileClick} className={`flex-1 ${getClassName()} border-black border-[1px]`}></button>;
+    return (
+        <button onClick={handleTileClick} className={`flex-1 ${getClassName(type)} border-black border-[1px]`}></button>
+    );
 };
 
-export default Board;
+export default BoardTile;

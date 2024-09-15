@@ -1,48 +1,24 @@
 import { useAppContext } from "../../useContextHook";
+
+import { generateGraph, usePathFindingAlgorithm } from "../../providers/useGraphAlgorithm";
+import { FieldType } from "../../types/FieldTypes";
+import { CLEAR_FIELD_TYPES, RESET_FIELD_TYPES } from "../../constants/FieldTypes";
+import { checkInputData } from "../../utils/NavBar";
 import Form from "./Form";
 
-import { FIELD_TYPE_LIST } from "../../constants";
-import { printMessages } from "../../misc";
-import { generateGraph, usePathFindingAlgorithm } from "../../providers/useGraphAlgorithm";
-
-type FieldType = (typeof FIELD_TYPE_LIST)[number];
 const NavBar = () => {
     const { boardData, boardDispatch, algorithmName } = useAppContext();
     const algorithm = usePathFindingAlgorithm();
-    const resetBoardList = [3, 4];
-    const clearBoardList = [2, 3, 4];
-
-    const checkInputData = () => {
-        const messages: string[] = [];
-        if (!boardData.board.length) {
-            messages.push("You need to generate a board.");
-        }
-        if (boardData.start.pos_x == -1 || boardData.start.pos_y == -1) {
-            messages.push("You need to select starting point.");
-        }
-        if (boardData.end.pos_x == -1 || boardData.end.pos_y == -1) {
-            messages.push("You need to select ending point.");
-        }
-        if (algorithmName === "") {
-            messages.push("You need to select an algorithm.");
-        }
-
-        if (messages.length) {
-            printMessages(messages);
-            return false;
-        }
-        return true;
-    };
 
     const handleAlgorithmStart = () => {
-        if (checkInputData()) {
+        if (checkInputData(boardData, algorithmName)) {
             const graph = generateGraph(boardData.board);
             algorithm(graph, boardData.start, boardData.end);
             return;
         }
     };
 
-    const handleBoardReset = (tiles: FieldType[]) => {
+    const handleBoardResetByTileType = (tiles: FieldType[]) => {
         boardData.board.forEach((row) => {
             row.forEach((tile) => {
                 if (tiles.find((elem) => elem === tile.type) !== undefined) {
@@ -61,11 +37,13 @@ const NavBar = () => {
     return (
         <div className="bg-gray-200 min-h-screen flex flex-col px-[1.5rem] pt-[1rem]">
             <div className="flex flex-col pt-[2rem] pb-[5rem] gap-3">
-                <button className='navbarButton' onClick={handleAlgorithmStart}>Start Algorithm</button>
-                <button className='navbarButton' onClick={() => handleBoardReset(Array.from(resetBoardList, (index) => FIELD_TYPE_LIST[index]))}>
+                <button className="navbarButton" onClick={handleAlgorithmStart}>
+                    Start Algorithm
+                </button>
+                <button className="navbarButton" onClick={() => handleBoardResetByTileType(RESET_FIELD_TYPES)}>
                     Reset Board
                 </button>
-                <button className='navbarButton' onClick={() => handleBoardReset(Array.from(clearBoardList, (index) => FIELD_TYPE_LIST[index]))}>
+                <button className="navbarButton" onClick={() => handleBoardResetByTileType(CLEAR_FIELD_TYPES)}>
                     Clear Board
                 </button>
             </div>

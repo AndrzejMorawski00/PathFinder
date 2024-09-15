@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useAppContext } from "../../useContextHook";
-
-import { MIN_BOARD_WIDTH, MAX_BOARD_WIDTH, MIN_BOARD_HEIGHT, MAX_BOARD_HEIGHT } from "../../constants";
-import { printMessages } from "../../misc";
+import { MAX_BOARD_HEIGHT, MAX_BOARD_WIDTH, MIN_BOARD_HEIGHT, MIN_BOARD_WIDTH } from "../../constants/BoardData";
+import { isValidKeyValue, printMessages, validateBoardSide } from "../../utils/utils";
 
 const INITIAL_FORM_DATA = {
     width: "",
@@ -14,19 +13,19 @@ type FormDataType = {
     height: string;
 };
 
-const validateBoardSide = (size: number, minVal: number, maxVal: number) => {
-    return size >= minVal && size <= maxVal;
-};
-
 const Form = () => {
     const [formData, setFormData] = useState<FormDataType>(INITIAL_FORM_DATA);
     const { boardDispatch } = useAppContext();
 
-    const handleFormDataChange = <T extends keyof FormDataType>(key: T, val: FormDataType[T]) => {
-        setFormData({ ...formData, [key]: val });
+    const handleFormDataChange = <T extends keyof FormDataType>(key: string, val: FormDataType[T]): void => {
+        if (isValidKeyValue(key, formData)) {
+            setFormData({ ...formData, [key]: val });
+            return;
+        }
+        throw new Error(`Invalid key ${key}`);
     };
 
-    const handleFormSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleFormSubmit = (e: React.MouseEvent<HTMLButtonElement>): void => {
         e.preventDefault();
         const { width, height } = formData;
         const messages: string[] = [];
@@ -51,7 +50,7 @@ const Form = () => {
     return (
         <form className="flex flex-col gap-[2rem]">
             <div className="flex flex-col gap-[0.2rem]">
-                <label htmlFor="">Width:</label>
+                <label htmlFor="width">Width:</label>
                 <input
                     className="px-2 py-1 tacking-wide"
                     type="number"
@@ -60,11 +59,11 @@ const Form = () => {
                     min={5}
                     max={100}
                     value={formData.width}
-                    onChange={(e) => handleFormDataChange("width", e.target.value)}
+                    onChange={(e) => handleFormDataChange(e.target.id, e.target.value)}
                 />
             </div>
             <div className="flex flex-col gap-[0.2rem]">
-                <label htmlFor="">height:</label>
+                <label htmlFor="height">Height:</label>
                 <input
                     className="px-2 py-1 tacking-wide"
                     type="number"
@@ -73,7 +72,7 @@ const Form = () => {
                     min={5}
                     max={100}
                     value={formData.height}
-                    onChange={(e) => handleFormDataChange("height", e.target.value)}
+                    onChange={(e) => handleFormDataChange(e.target.id, e.target.value)}
                 />
             </div>
             <button className="bg-red-500" onClick={handleFormSubmit} type="submit">

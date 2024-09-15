@@ -1,8 +1,9 @@
-import { TilePos, TileType, GraphType, Comparator, TileKey } from "../types";
-import { PriorityQueue } from "./PriorityQueue";
+import { TilePos, TileType, GraphType, TileKey } from "../types";
+import { PriorityQueue } from "../utils/DataStructures/PriorityQueue";
 import { useAppContext } from "../useContextHook";
-import { createFactory } from "./HeuristricProvider";
 import { ALGORITHM_TYPE_LIST } from "../constants";
+import { Comparator } from "../types/DataStructures";
+import { createFactory } from "../utils/utils";
 
 type T = [number, string];
 
