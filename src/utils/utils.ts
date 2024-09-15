@@ -20,7 +20,7 @@ export const isValidKeyValue = <T extends Object>(s: string, obj: T): boolean =>
     return s in obj;
 };
 
-export const createFactory = (): HeuristicFactory => {
+export const createHeuristicFactory = (): HeuristicFactory => {
     const factory = new HeuristicFactory();
     factory.addHeuristic("zero", defaultHeuristic);
     factory.addHeuristic("one", oneHeuristic);

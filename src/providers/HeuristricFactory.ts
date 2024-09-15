@@ -1,4 +1,4 @@
-import { Heuristic } from "../types";
+import { Heuristic } from "../types/types";
 
 export class HeuristicFactory {
     private heuristicDict: Map<string, Heuristic>;

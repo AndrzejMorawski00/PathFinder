@@ -1,4 +1,5 @@
-import { StartEndKey, TileKey, TileType, TileTypes } from "../../types";
+import { StartEndKey } from "../../types/tileReducer";
+import { TileKey, TileType, TileTypes } from "../../types/TileTypes";
 import { useAppContext, useMainContext } from "../../useContextHook";
 import { getClassName } from "../../utils/BoardTile";
 
@@ -11,7 +12,7 @@ const BoardTile = ({ tile }: Props) => {
     const { boardData, boardDispatch } = useAppContext();
     const { fieldType } = useMainContext(); // selected FieldType from header to replace old value
 
-    const updateStartEndField = (key: StartEndKey, new_x: number, new_y: number) => {
+    const updateStartEndField = (key: StartEndKey, new_x: number, new_y: number): void => {
         boardDispatch({
             type: "changeStartEnd",
             key: key,
@@ -20,7 +21,7 @@ const BoardTile = ({ tile }: Props) => {
         });
     };
 
-    const updateTileValue = (field: TileKey, newValue: TileType[TileKey], pos_x: number, pos_y: number) => {
+    const updateTileValue = (field: TileKey, newValue: TileType[TileKey], pos_x: number, pos_y: number): void => {
         boardDispatch({
             type: "changeTile",
             pos_x: pos_x,
@@ -30,14 +31,14 @@ const BoardTile = ({ tile }: Props) => {
         });
     };
 
-    const clearTileType = (tileType: TileTypes, pos_x: number, pos_y: number) => {
+    const clearTileType = (tileType: TileTypes, pos_x: number, pos_y: number): void => {
         if (tileType === "start" || tileType === "end") {
             updateStartEndField(tileType as StartEndKey, -1, -1);
         }
         updateTileValue("type", "", pos_x, pos_y);
     };
 
-    const handleTileClick = () => {
+    const handleTileClick = (): void => {
         if (fieldType === "start" || fieldType === "end") {
             const prevTile = fieldType === "start" ? boardData.start : boardData.end;
             clearTileType(fieldType, prevTile.pos_x, prevTile.pos_y);

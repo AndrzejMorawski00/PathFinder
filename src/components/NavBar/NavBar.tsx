@@ -1,35 +1,37 @@
 import { useAppContext } from "../../useContextHook";
 
-import { generateGraph, usePathFindingAlgorithm } from "../../providers/useGraphAlgorithm";
-import { FieldType } from "../../types/FieldTypes";
+import { usePathFindingAlgorithm } from "../../providers/useGraphAlgorithm";
 import { CLEAR_FIELD_TYPES, RESET_FIELD_TYPES } from "../../constants/FieldTypes";
 import { checkInputData } from "../../utils/NavBar";
+import { generateGraph } from "../../utils/graphAlgorithm";
+import { FieldType } from "../../types/FieldTypes";
 import Form from "./Form";
 
 const NavBar = () => {
     const { boardData, boardDispatch, algorithmName } = useAppContext();
     const algorithm = usePathFindingAlgorithm();
 
-    const handleAlgorithmStart = () => {
-        if (checkInputData(boardData, algorithmName)) {
-            const graph = generateGraph(boardData.board);
-            algorithm(graph, boardData.start, boardData.end);
+    const handleAlgorithmStart = (): void => {
+        if (!checkInputData(boardData, algorithmName)) {
             return;
         }
+        const graph = generateGraph(boardData.board);
+        algorithm(graph, boardData.start, boardData.end);
     };
 
-    const handleBoardResetByTileType = (tiles: FieldType[]) => {
+    const handleBoardResetByTileType = (tiles: FieldType[]): void => {
         boardData.board.forEach((row) => {
             row.forEach((tile) => {
-                if (tiles.find((elem) => elem === tile.type) !== undefined) {
-                    boardDispatch({
-                        type: "changeTile",
-                        pos_x: tile.pos.pos_x,
-                        pos_y: tile.pos.pos_y,
-                        field: "type",
-                        newValue: "",
-                    });
+                if (!tiles.find((elem) => elem === tile.type)) {
+                    return;
                 }
+                boardDispatch({
+                    type: "changeTile",
+                    pos_x: tile.pos.pos_x,
+                    pos_y: tile.pos.pos_y,
+                    field: "type",
+                    newValue: "",
+                });
             });
         });
     };

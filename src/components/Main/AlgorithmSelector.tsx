@@ -15,7 +15,7 @@ const AlgorithmSelector = () => {
         }
     }, [algorithmName]);
 
-    const handleOldAlgorithmChange = () => {
+    const handleOldAlgorithmChange = (): void => {
         const algorithm = AlgorithmHeuristics.get(algorithmName);
         if (algorithm === undefined) {
             setOldAlgorithm("");
@@ -26,7 +26,7 @@ const AlgorithmSelector = () => {
         }
     };
 
-    const handleFormDataChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleFormDataChange = (event: React.ChangeEvent<HTMLSelectElement>): void => {
         const value = event.target.value;
         let [algorithm, heuristic] = value.split("-");
         if (!ALGORITHM_TYPES.includes(algorithm as AlgorithmTypes)) {

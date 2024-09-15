@@ -1,8 +1,8 @@
 import { createContext, ReactNode, useReducer, useState } from "react";
 import { AppContextType } from "../types/ContextTypes";
 import boardReducer from "./TileReducer";
-import { DEFAULT_BOARD } from "../constants";
-import { ExtendedAlgorithmTypes } from "../types";
+import { DEFAULT_BOARD } from "../constants/BoardData";
+import { ExtendedAlgorithmTypes } from "../types/AlgorithmTypes";
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -15,11 +15,11 @@ const AppContextProvider = ({ children }: Props) => {
     const [algorithm, setAlgorithm] = useState<ExtendedAlgorithmTypes>("");
     const [heuristic, setHeuristic] = useState("");
 
-    const handleAlgorithmChange = (newAlgorithm: ExtendedAlgorithmTypes) => {
+    const handleAlgorithmChange = (newAlgorithm: ExtendedAlgorithmTypes): void => {
         setAlgorithm(newAlgorithm);
     };
 
-    const handleHeuristicChange = (newAlgorithm: string) => {
+    const handleHeuristicChange = (newAlgorithm: string): void => {
         setHeuristic(newAlgorithm);
     };
 

@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useState } from "react";
 import { MainContextType } from "../types/ContextTypes";
-import { TileTypes } from "../types";
+import { TileTypes } from "../types/TileTypes";
 
 export const MainContext = createContext<MainContextType | undefined>(undefined);
 
