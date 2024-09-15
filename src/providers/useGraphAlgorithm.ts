@@ -27,9 +27,10 @@ export const generateGraph = (board: TileType[][]): GraphType => {
         [0, 1],
         [0, -1],
     ];
+
     const graphMap = new Map<string, TilePos[]>();
     for (let i = 0; i < board.length; i++) {
-        for (let j = 0; j < board[i].length; j++) {
+        for (let j = 0; j < board[0].length; j++) {
             if (board[i][j].type != "obstacle") {
                 const currPos = board[i][j].pos;
                 const JSONPos = JSON.stringify(currPos);
@@ -42,8 +43,8 @@ export const generateGraph = (board: TileType[][]): GraphType => {
                         pos_y: currPos.pos_y + move[0],
                     };
                     if (
-                        isValidMove(neighbor.pos_x, -1, board.length) &&
-                        isValidMove(neighbor.pos_y, -1, board[i].length) &&
+                        isValidMove(neighbor.pos_y, -1, board.length) &&
+                        isValidMove(neighbor.pos_x, -1, board[i].length) &&
                         board[neighbor.pos_y][neighbor.pos_x].type !== "obstacle"
                     ) {
                         const currList = graphMap.get(JSONPos);
@@ -136,7 +137,6 @@ export const usePathFindingAlgorithm = () => {
         const pq = new PriorityQueue<T>([], TileComparator);
         const heuresticConst = getHeuresticConstantValue(algorithmName);
         const heurestic = factory.getHeuristic(heuristicName);
-        console.log(heuristicName, heuresticConst, heurestic);
         for (const key of graphKeys) {
             distances.set(key, Infinity);
             prev.set(key, "");

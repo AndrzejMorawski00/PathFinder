@@ -29,7 +29,7 @@ const Main = () => {
 
     return (
         <MainContext.Provider value={mainContext}>
-            <div>
+            <div className="flex flex-col min-h-screen w-[100%] min-w-[70%]">
                 <Header />
                 <Board />
             </div>

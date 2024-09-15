@@ -4,9 +4,9 @@ import { useAppContext, useMainContext } from "../../useContextHook";
 const Board = () => {
     const { boardData } = useAppContext();
     return (
-        <div>
+        <div className="flex flex-col flex-1 w-full h-full">
             {boardData.board.map((row, idx) => (
-                <div key={idx}>
+                <div key={idx} className="flex flex-row flex-1 w-full">
                     {row.map((tile, idx) => (
                         <BoardTile key={idx} tile={tile} />
                     ))}
@@ -71,25 +71,21 @@ const BoardTile = ({ tile }: IBoardTile) => {
     const getClassName = (): string => {
         switch (type) {
             case "start":
-                return "start";
+                return "bg-green-500";
             case "end":
-                return "end";
+                return "bg-red-500";
             case "obstacle":
-                return "obstacle";
+                return "bg-gray-500";
             case "visited":
-                return "visited";
+                return "bg-yellow-300";
             case "path":
-                return "path";
+                return "bg-blue-500";
             default:
-                return "";
+                return "bg-gray-200";
         }
     };
 
-    return (
-        <button onClick={handleTileClick} className={getClassName()}>
-            x
-        </button>
-    );
+    return <button onClick={handleTileClick} className={`flex-1 ${getClassName()} border-black border-[1px]`}></button>;
 };
 
 export default Board;

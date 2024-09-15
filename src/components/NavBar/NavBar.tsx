@@ -36,7 +36,6 @@ const NavBar = () => {
 
     const handleAlgorithmStart = () => {
         if (checkInputData()) {
-            console.clear();
             const graph = generateGraph(boardData.board);
             algorithm(graph, boardData.start, boardData.end);
             return;
@@ -60,13 +59,13 @@ const NavBar = () => {
     };
 
     return (
-        <div>
-            <div>
-                <button onClick={handleAlgorithmStart}>Start Algorithm</button>
-                <button onClick={() => handleBoardReset(Array.from(resetBoardList, (index) => FIELD_TYPE_LIST[index]))}>
+        <div className="bg-gray-200 min-h-screen flex flex-col px-[1.5rem] pt-[1rem]">
+            <div className="flex flex-col pt-[2rem] pb-[5rem] gap-3">
+                <button className='navbarButton' onClick={handleAlgorithmStart}>Start Algorithm</button>
+                <button className='navbarButton' onClick={() => handleBoardReset(Array.from(resetBoardList, (index) => FIELD_TYPE_LIST[index]))}>
                     Reset Board
                 </button>
-                <button onClick={() => handleBoardReset(Array.from(clearBoardList, (index) => FIELD_TYPE_LIST[index]))}>
+                <button className='navbarButton' onClick={() => handleBoardReset(Array.from(clearBoardList, (index) => FIELD_TYPE_LIST[index]))}>
                     Clear Board
                 </button>
             </div>

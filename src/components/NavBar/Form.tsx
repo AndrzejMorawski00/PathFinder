@@ -49,10 +49,11 @@ const Form = () => {
     };
 
     return (
-        <form>
-            <div>
+        <form className="flex flex-col gap-[2rem]">
+            <div className="flex flex-col gap-[0.2rem]">
                 <label htmlFor="">Width:</label>
                 <input
+                    className="px-2 py-1 tacking-wide"
                     type="number"
                     name="width"
                     id="width"
@@ -62,9 +63,10 @@ const Form = () => {
                     onChange={(e) => handleFormDataChange("width", e.target.value)}
                 />
             </div>
-            <div>
+            <div className="flex flex-col gap-[0.2rem]">
                 <label htmlFor="">height:</label>
                 <input
+                    className="px-2 py-1 tacking-wide"
                     type="number"
                     name="height"
                     id="height"
@@ -74,7 +76,7 @@ const Form = () => {
                     onChange={(e) => handleFormDataChange("height", e.target.value)}
                 />
             </div>
-            <button onClick={handleFormSubmit} type="submit">
+            <button className="bg-red-500" onClick={handleFormSubmit} type="submit">
                 Generate Board
             </button>
         </form>

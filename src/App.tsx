@@ -45,7 +45,7 @@ function App() {
 
     return (
         <AppContext.Provider value={appContext}>
-            <div className="main">
+            <div className="flex flex-row min-h-screen w-[100vw]">
                 <NavBar />
                 <Main />
             </div>
