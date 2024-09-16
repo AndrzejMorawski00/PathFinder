@@ -12,8 +12,9 @@ interface Props {
 
 const AppContextProvider = ({ children }: Props) => {
     const [boardData, boardDispatch] = useReducer(boardReducer, DEFAULT_BOARD);
+    const [isRunning, setIsRunning] = useState<boolean>(false);
     const [algorithm, setAlgorithm] = useState<ExtendedAlgorithmTypes>("");
-    const [heuristic, setHeuristic] = useState("");
+    const [heuristic, setHeuristic] = useState<string>("");
 
     const handleAlgorithmChange = (newAlgorithm: ExtendedAlgorithmTypes): void => {
         setAlgorithm(newAlgorithm);
@@ -23,7 +24,13 @@ const AppContextProvider = ({ children }: Props) => {
         setHeuristic(newAlgorithm);
     };
 
+    const handleIsRunningChange = (newValue: boolean) => {
+        setIsRunning(newValue);
+    };
+
     const appContext: AppContextType = {
+        isRunning: isRunning,
+        handleIsRunningChange: handleIsRunningChange,
         boardData: boardData,
         boardDispatch: boardDispatch,
         algorithmName: algorithm,

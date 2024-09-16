@@ -4,15 +4,21 @@ import { useAppContext } from "../useContextHook";
 import { TileKey, TilePos, TileType } from "../types/TileTypes";
 import { GraphType, PathFindingFunction } from "../types/Graph";
 import { createHeuristicFactory } from "../utils/utils";
-import { delay, findPath, findShortestPath, isValidField, TileComparator } from "../utils/graphAlgorithm";
+import { delay, findPath, findShortestPath, getDelay, isValidField, TileComparator } from "../utils/graphAlgorithm";
 
 import { PriorityQueueItem } from "../types/AlgorithmTypes";
+import { AnimationSpeed } from "../constants/GraphAlgorithm";
 
 export const usePathFindingAlgorithm = (): PathFindingFunction => {
     const { boardDispatch, boardData, algorithmName, heuristicName } = useAppContext();
     const heuristicFactory = createHeuristicFactory();
 
-    const handleTileColorChange = async (tile: TilePos, field: TileKey, newValue: TileType[TileKey]): Promise<void> => {
+    const handleTileColorChange = async (
+        delayValue: AnimationSpeed,
+        tile: TilePos,
+        field: TileKey,
+        newValue: TileType[TileKey]
+    ): Promise<void> => {
         const { pos_x, pos_y } = tile;
         if (!(isValidField(pos_x, pos_y, boardData.start) && isValidField(pos_x, pos_y, boardData.end))) {
             return;
@@ -24,20 +30,21 @@ export const usePathFindingAlgorithm = (): PathFindingFunction => {
             field: field,
             newValue: newValue,
         });
-        await delay(50);
+        await delay(delayValue);
     };
 
-    const handleColoringPath = async (path: string[], exists: boolean): Promise<void> => {
+    const handleColoringPath = async (delayValue: AnimationSpeed, path: string[], exists: boolean): Promise<void> => {
         if (!exists) {
             return;
         }
         for (let i = 0; i < path.length; i++) {
             const JSONItem = JSON.parse(path[i]);
-            await handleTileColorChange(JSONItem, "type", "path");
+            await handleTileColorChange(delayValue, JSONItem, "type", "path");
         }
     };
 
     const pathFindingAlgorithm = async (graph: GraphType, start: TilePos, end: TilePos): Promise<void> => {
+        const delayValue = getDelay(boardData.board.length, boardData.board[0].length);
         let graphKeys = Array.from(graph.keys());
         const distances = new Map<string, number>();
         const visited = new Set<string>();
@@ -45,7 +52,6 @@ export const usePathFindingAlgorithm = (): PathFindingFunction => {
         const pq = new PriorityQueue<PriorityQueueItem>([], TileComparator);
         const heuresticConst = algorithmName === "A*" ? 1 : 0;
         const heuristic = heuristicFactory.getHeuristic(heuristicName);
-
         for (const key of graphKeys) {
             distances.set(key, Infinity);
             prev.set(key, "");
@@ -53,7 +59,6 @@ export const usePathFindingAlgorithm = (): PathFindingFunction => {
 
         distances.set(JSON.stringify(start), 0);
         pq.insertValue([0, JSON.stringify(start)]);
-
         while (!pq.isEmpty()) {
             const [_, item] = pq.getHead();
             if (visited.has(item)) {
@@ -62,7 +67,7 @@ export const usePathFindingAlgorithm = (): PathFindingFunction => {
 
             visited.add(item);
             const JSONItem: TilePos = JSON.parse(item);
-            await handleTileColorChange(JSONItem, "type", "visited");
+            await handleTileColorChange(delayValue, JSONItem, "type", "visited");
 
             const neighbors = graph.get(item) || [];
             for (const neighbor of neighbors) {
@@ -89,11 +94,12 @@ export const usePathFindingAlgorithm = (): PathFindingFunction => {
         }
 
         const [path, exists] = findShortestPath(boardData.end, prev, distances);
-        await handleColoringPath(path, exists);
+        await handleColoringPath(delayValue, path, exists);
         exists ? alert("Finish") : alert(`Path doesn't exists`);
     };
 
     const greedyBFSAlgorith = async (graph: GraphType, start: TilePos, end: TilePos): Promise<void> => {
+        const delayValue = getDelay(boardData.board.length, boardData.board[0].length);
         const visited = new Set<string>();
         const prev = new Map<string, string>();
         const pq = new PriorityQueue<[number, string]>([], TileComparator);
@@ -107,7 +113,7 @@ export const usePathFindingAlgorithm = (): PathFindingFunction => {
             }
             visited.add(item);
             const JSONItem: TilePos = JSON.parse(item);
-            await handleTileColorChange(JSONItem, "type", "visited");
+            await handleTileColorChange(delayValue, JSONItem, "type", "visited");
 
             const neighbors = graph.get(item) || [];
             for (const neighbor of neighbors) {
@@ -124,10 +130,9 @@ export const usePathFindingAlgorithm = (): PathFindingFunction => {
             }
         }
         const [path, exists] = findPath(boardData.end, prev);
-        await handleColoringPath(path, exists);
+        await handleColoringPath(delayValue, path, exists);
         exists ? alert("Finish") : alert(`Path doesn't exists`);
     };
-
     if (algorithmName === "Greedy BFS") {
         return greedyBFSAlgorith;
     }

@@ -4,6 +4,8 @@ import { ExtendedAlgorithmTypes } from "./AlgorithmTypes";
 import { TileTypes } from "./TileTypes";
 
 export type AppContextType = {
+    isRunning: boolean;
+    handleIsRunningChange: (newValue: boolean) => void;
     boardData: BoardType;
     boardDispatch: Dispatch<TileReducerAction>;
     algorithmName: ExtendedAlgorithmTypes;

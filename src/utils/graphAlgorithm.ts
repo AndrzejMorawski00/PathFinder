@@ -1,4 +1,4 @@
-import { MOVES } from "../constants/GraphAlgorithm";
+import { AnimationSpeed, MOVES } from "../constants/GraphAlgorithm";
 import { PriorityQueueItem } from "../types/AlgorithmTypes";
 import { Comparator } from "../types/DataStructures";
 import { GraphType } from "../types/Graph";
@@ -16,7 +16,21 @@ export const isValidField = (pos_x: number, pos_y: number, field: TilePos) => {
     return !(pos_x == field.pos_x && pos_y == field.pos_y);
 };
 
-export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+export const getDelay = (width: number, height: number): AnimationSpeed => {
+    const tilesCount = width * height;
+    if (tilesCount >= 5000) {
+        return AnimationSpeed.ULTRA_FAST;
+    } else if (tilesCount >= 3000) {
+        return AnimationSpeed.SUPER_FAST;
+    } else if (tilesCount >= 2000) {
+        return AnimationSpeed.FAST;
+    } else if (tilesCount >= 1000) {
+        return AnimationSpeed.MEDIUM;
+    }
+    return AnimationSpeed.SLOW;
+};
+
+export const delay = (ms: AnimationSpeed) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const getValidMoves = (board: TileType[][], currPos: TilePos, boardLen: number, rowLen: number) => {
     const validMoves = MOVES.map((move) => ({ pos_x: currPos.pos_x + move[1], pos_y: currPos.pos_y + move[0] })).filter(

@@ -9,7 +9,7 @@ interface Props {
 
 const BoardTile = ({ tile }: Props) => {
     const { pos, type } = tile; // CurrentTileData (position and type)
-    const { boardData, boardDispatch } = useAppContext();
+    const { boardData, boardDispatch, isRunning } = useAppContext();
     const { fieldType } = useMainContext(); // selected FieldType from header to replace old value
 
     const updateStartEndField = (key: StartEndKey, new_x: number, new_y: number): void => {
@@ -39,6 +39,9 @@ const BoardTile = ({ tile }: Props) => {
     };
 
     const handleTileClick = (): void => {
+        if (isRunning) {
+            return;
+        }
         if (fieldType === "start" || fieldType === "end") {
             const prevTile = fieldType === "start" ? boardData.start : boardData.end;
             clearTileType(fieldType, prevTile.pos_x, prevTile.pos_y);
