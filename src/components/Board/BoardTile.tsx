@@ -1,16 +1,16 @@
 import { StartEndKey } from "../../types/tileReducer";
 import { TileKey, TileType, TileTypes } from "../../types/TileTypes";
-import { useAppContext, useMainContext } from "../../useContextHook";
+import { useAppContext } from "../../useContextHook";
 import { getClassName } from "../../utils/BoardTile";
 
 interface Props {
     tile: TileType;
+    isMouseDown: boolean;
 }
 
-const BoardTile = ({ tile }: Props) => {
-    const { pos, type } = tile; // CurrentTileData (position and type)
-    const { boardData, boardDispatch, isRunning } = useAppContext();
-    const { fieldType } = useMainContext(); // selected FieldType from header to replace old value
+const BoardTile = ({ tile, isMouseDown }: Props) => {
+    const { pos, type } = tile;
+    const { fieldType, boardData, boardDispatch, isRunning } = useAppContext();
 
     const updateStartEndField = (key: StartEndKey, new_x: number, new_y: number): void => {
         boardDispatch({
@@ -58,8 +58,18 @@ const BoardTile = ({ tile }: Props) => {
         }
     };
 
+    const handleMouseEnter = (): void => {
+        if (isMouseDown && fieldType === "obstacle") {
+            handleTileClick();
+        }
+    };
+
     return (
-        <button onClick={handleTileClick} className={`flex-1 ${getClassName(type)} border-black border-[1px]`}></button>
+        <button
+            onMouseEnter={handleMouseEnter}
+            onClick={handleTileClick}
+            className={`flex-1 ${getClassName(type)} border-black border-[1px]`}
+        ></button>
     );
 };
 

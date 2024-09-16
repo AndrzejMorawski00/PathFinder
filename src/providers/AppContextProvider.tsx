@@ -3,6 +3,7 @@ import { AppContextType } from "../types/ContextTypes";
 import boardReducer from "./TileReducer";
 import { DEFAULT_BOARD } from "../constants/BoardData";
 import { ExtendedAlgorithmTypes } from "../types/AlgorithmTypes";
+import { TileTypes } from "../types/TileTypes";
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -15,6 +16,15 @@ const AppContextProvider = ({ children }: Props) => {
     const [isRunning, setIsRunning] = useState<boolean>(false);
     const [algorithm, setAlgorithm] = useState<ExtendedAlgorithmTypes>("");
     const [heuristic, setHeuristic] = useState<string>("");
+    const [fieldType, setFieldType] = useState<TileTypes>("");
+
+    const handleFieldTypeChange = (newType: TileTypes) => {
+        if (newType === fieldType) {
+            setFieldType("");
+        } else {
+            setFieldType(newType);
+        }
+    };
 
     const handleAlgorithmChange = (newAlgorithm: ExtendedAlgorithmTypes): void => {
         setAlgorithm(newAlgorithm);
@@ -29,6 +39,8 @@ const AppContextProvider = ({ children }: Props) => {
     };
 
     const appContext: AppContextType = {
+        fieldType: fieldType,
+        handleFieldTypeChange: handleFieldTypeChange,
         isRunning: isRunning,
         handleIsRunningChange: handleIsRunningChange,
         boardData: boardData,

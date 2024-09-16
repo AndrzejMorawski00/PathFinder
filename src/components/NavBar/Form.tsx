@@ -49,6 +49,7 @@ const Form = () => {
 
     return (
         <form className="flex flex-col gap-[2rem]">
+            <h2>Size of the Board:</h2>
             <div className="flex flex-col gap-[0.2rem]">
                 <label htmlFor="width">Width:</label>
                 <input

@@ -4,6 +4,8 @@ import { ExtendedAlgorithmTypes } from "./AlgorithmTypes";
 import { TileTypes } from "./TileTypes";
 
 export type AppContextType = {
+    fieldType: TileTypes;
+    handleFieldTypeChange: (newType: TileTypes) => void;
     isRunning: boolean;
     handleIsRunningChange: (newValue: boolean) => void;
     boardData: BoardType;
@@ -12,9 +14,4 @@ export type AppContextType = {
     handleAlgorithmChange: (newAlgorithm: ExtendedAlgorithmTypes) => void;
     heuristicName: string;
     handleHeuristicChange: (newAlgorithm: string) => void;
-};
-
-export type MainContextType = {
-    fieldType: TileTypes;
-    handleFieldTypeChange: (newType: TileTypes) => void;
 };
