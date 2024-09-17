@@ -30,13 +30,13 @@ export const getDelay = (width: number, height: number): AnimationSpeed => {
     return AnimationSpeed.SLOW;
 };
 
-export const delay = (ms: AnimationSpeed) => new Promise((resolve) => setTimeout(resolve, ms));
+export const delay = (ms: AnimationSpeed | number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const getValidMoves = (board: TileType[][], currPos: TilePos, boardLen: number, rowLen: number) => {
     const validMoves = MOVES.map((move) => ({ pos_x: currPos.pos_x + move[1], pos_y: currPos.pos_y + move[0] })).filter(
         (move) =>
-            isValidMove(move.pos_x, -1, boardLen) &&
-            isValidMove(move.pos_y, -1, rowLen) &&
+            isValidMove(move.pos_x, -1, rowLen) &&
+            isValidMove(move.pos_y, -1, boardLen) &&
             board[move.pos_y][move.pos_x].type !== "obstacle"
     );
     return validMoves;

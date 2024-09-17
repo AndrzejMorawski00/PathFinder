@@ -1,12 +1,22 @@
+@import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-.navbarButton {
-    padding: 0.2rem 0.7rem;
-    background-color: red;
-    font-size: 1.2rem;
-    border: 1px solid black;
-    border-radius: 5px;
+:root {
+    --backgroundColor: 161, 177, 209;
+    --boardBackground: 233, 237, 245;
+    --boardHover: 0, 0, 0;
+    --fontColor: 9, 18, 18;
+    --fontHover: 63, 111, 206;
+    --startButton: 53, 153, 69;
+    --endButton: 178, 29, 15;
+    --obstacles: 95, 101, 113;
+    --path: 107, 100, 168;
+    --visited: 231, 197, 61;
 }
 
+body {
+    @apply font-sans;
+}

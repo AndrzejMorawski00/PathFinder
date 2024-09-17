@@ -95,6 +95,8 @@ export const usePathFindingAlgorithm = (): PathFindingFunction => {
 
         const [path, exists] = findShortestPath(boardData.end, prev, distances);
         await handleColoringPath(delayValue, path, exists);
+        await delay(100);
+
         exists ? alert("Finish") : alert(`Path doesn't exists`);
     };
 
@@ -131,6 +133,7 @@ export const usePathFindingAlgorithm = (): PathFindingFunction => {
         }
         const [path, exists] = findPath(boardData.end, prev);
         await handleColoringPath(delayValue, path, exists);
+        await delay(100);
         exists ? alert("Finish") : alert(`Path doesn't exists`);
     };
     if (algorithmName === "Greedy BFS") {

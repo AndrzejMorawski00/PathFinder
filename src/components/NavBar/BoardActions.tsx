@@ -25,16 +25,16 @@ const BoardActions = ({}: Props) => {
     };
 
     return (
-        <div className="flex flex-col pt-[2rem] pb-[5rem] gap-3">
+        <div className="flex flex-col pt-3 gap-3">
             <button
-                className="navbarButton"
+                className="border-2 border-fontColor px-3 capitalize font-bold text-l xl:text-xl 2xl:text-3xl rounded transition duration-150 hover:bg-fontHover/50 "
                 title="Remove Visited Fields"
                 onClick={() => handleBoardResetByTileType(RESET_FIELD_TYPES)}
             >
                 Reset Board
             </button>
             <button
-                className="navbarButton"
+                className="border-2 border-fontColor px-3 capitalize font-bold text-l xl:text-xl 2xl:text-3xl rounded transition duration-150 hover:bg-fontHover/50 "
                 title="Remove Visited Fields and Obstacles"
                 onClick={() => handleBoardResetByTileType(CLEAR_FIELD_TYPES)}
             >

@@ -1,18 +1,18 @@
 import { TileTypes } from "../types/TileTypes";
 
-export const getClassName = (type: TileTypes): string => {
+export const getTileBackgroundColorName = (type: TileTypes): string => {
     switch (type) {
         case "start":
-            return "bg-green-500";
+            return "bg-startPoint";
         case "end":
-            return "bg-red-500";
+            return "bg-endPoint";
         case "obstacle":
-            return "bg-gray-500";
+            return "bg-obstacles";
         case "visited":
-            return "bg-yellow-300";
+            return "bg-visited";
         case "path":
-            return "bg-blue-500";
+            return "bg-path";
         default:
-            return "bg-gray-200";
+            return "bg-boardBackground";
     }
 };

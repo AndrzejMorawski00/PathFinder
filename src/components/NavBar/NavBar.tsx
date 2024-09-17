@@ -4,10 +4,12 @@ import BoardActions from "./BoardActions";
 
 const NavBar = () => {
     return (
-        <div className="bg-gray-200 min-h-screen flex flex-col px-[1.5rem] pt-[1rem]">
-            <Form />
-            <TileSelector />
-            <BoardActions />
+        <div className="flex flex-col items-center xl:justify-center pt-2 bg-backgroundColor h-screen">
+            <div className="flex flex-col gap-3 xl:gap-5 2xl:gap-8 items-center justify-between">
+                <Form />
+                <TileSelector />
+                <BoardActions />
+            </div>
         </div>
     );
 };

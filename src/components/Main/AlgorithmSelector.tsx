@@ -38,17 +38,27 @@ const AlgorithmSelector = () => {
         handleHeuristicChange(heuristic);
         handleAlgorithmChange(algorithm as ExtendedAlgorithmTypes);
     };
-
     return (
-        <form>
-            <label htmlFor="algorithm">Select an algorithm:</label>
-            <select name="algorithm" id="algorithm" onChange={handleFormDataChange}>
+        <form className="flex flex-col xl:flex-row items-left justify-center gap-1">
+            <label htmlFor="algorithm" className="text-xl xl:text-2xl 2xl:text-3x tracking-wider font-semibold">
+                Select an algorithm:
+            </label>
+            <select
+                className="border-b-2 border-fontHover bg-boardBackground text-xl xl:text-2xl 2xl:text-3x rounded-none px-1 py-1 outline-none transition duration-300 hover:"
+                name="algorithm"
+                id="algorithm"
+                onChange={handleFormDataChange}
+            >
                 <Fragment>
-                    <option value={oldAlgorithm}>{oldAlgorithm}</option>
+                    <option className="" value={oldAlgorithm}>
+                        {oldAlgorithm}
+                    </option>
                 </Fragment>
                 {ALGORITHM_TYPES.map((algorithm) => (
                     <Fragment key={algorithm}>
-                        <option value={algorithm}>{algorithm}</option>
+                        <option className="" value={algorithm}>
+                            {algorithm}
+                        </option>
                         {AlgorithmHeuristics.get(algorithm)?.list.map((heuristic) => (
                             <option key={heuristic} value={`${algorithm}-${heuristic}`}>
                                 {algorithm} - {heuristic}

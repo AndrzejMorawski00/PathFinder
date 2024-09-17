@@ -1,7 +1,8 @@
+import classNames from "classnames";
 import { StartEndKey } from "../../types/tileReducer";
 import { TileKey, TileType, TileTypes } from "../../types/TileTypes";
 import { useAppContext } from "../../useContextHook";
-import { getClassName } from "../../utils/BoardTile";
+import { getTileBackgroundColorName } from "../../utils/BoardTile";
 
 interface Props {
     tile: TileType;
@@ -68,7 +69,10 @@ const BoardTile = ({ tile, isMouseDown }: Props) => {
         <button
             onMouseEnter={handleMouseEnter}
             onClick={handleTileClick}
-            className={`flex-1 ${getClassName(type)} border-black border-[1px]`}
+            className={classNames(
+                "border-[1px] border-black/20 flex-1 transition duration-50",
+                getTileBackgroundColorName(type)
+            )}
         ></button>
     );
 };

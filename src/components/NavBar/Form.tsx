@@ -48,12 +48,14 @@ const Form = () => {
     };
 
     return (
-        <form className="flex flex-col gap-[2rem]">
-            <h2>Size of the Board:</h2>
-            <div className="flex flex-col gap-[0.2rem]">
-                <label htmlFor="width">Width:</label>
+        <form className="flex flex-col gap-1 xl:gap-4 2xl:gap-6 w-fit">
+            <h2 className="text-2xl xl:text-3xl 2xl:text-5xl font-bold text-center">Size of the Board</h2>
+            <div className="flex flex-row px-3 items-center justify-between">
+                <label className="text-l xl:text-xl 2xl:text-3xl tracking-tight" htmlFor="width">
+                    Width:
+                </label>
                 <input
-                    className="px-2 py-1 tacking-wide"
+                    className="bg-boardBackground text-l  xl:text-xl 2xl:text-3xl px-2 tacking-wide w-[40%] outline-none font-semibold border-b-2 border-b-fontHover transition duration-300 hover:bg-boardBackground/85 active:hover:bg-boardBackground/85 focus:hover:bg-boardBackground/85"
                     type="number"
                     name="width"
                     id="width"
@@ -63,10 +65,13 @@ const Form = () => {
                     onChange={(e) => handleFormDataChange(e.target.id, e.target.value)}
                 />
             </div>
-            <div className="flex flex-col gap-[0.2rem]">
-                <label htmlFor="height">Height:</label>
+
+            <div className="flex flex-row gap-3 p-3 items-center justify-between">
+                <label className="text-l  xl:text-xl 2xl:text-3xl tracking-tight" htmlFor="height">
+                    Height:
+                </label>
                 <input
-                    className="px-2 py-1 tacking-wide"
+                    className="bg-boardBackground text-l  xl:text-xl 2xl:text-3xl px-2 tacking-wide w-[40%] outline-none font-semibold border-b-2 border-b-fontHover transition duration-300 hover:bg-boardBackground/85 active:hover:bg-boardBackground/85 focus:hover:bg-boardBackground/85"
                     type="number"
                     name="height"
                     id="height"
@@ -76,7 +81,11 @@ const Form = () => {
                     onChange={(e) => handleFormDataChange(e.target.id, e.target.value)}
                 />
             </div>
-            <button className="bg-red-500" onClick={handleFormSubmit} type="submit">
+            <button
+                className="border-2 mx-5 p-1 border-fontColor font-bold text-l xl:text-xl 2xl:text-3x text-nowrap rounded transition duration-300 hover:bg-fontColor/20"
+                onClick={handleFormSubmit}
+                type="submit"
+            >
                 Generate Board
             </button>
         </form>

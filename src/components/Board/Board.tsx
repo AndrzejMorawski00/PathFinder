@@ -12,7 +12,7 @@ const Board = () => {
 
     return (
         <div
-            className="flex flex-col items-center justify-center flex-1 w-full h-full"
+            className="bg-boardBackground flex flex-col items-center justify-center flex-1 w-full h-full"
             onMouseDown={() => handleIsMouseDownChange(true)}
             onMouseUp={() => handleIsMouseDownChange(false)}
         >
@@ -25,7 +25,7 @@ const Board = () => {
                     </div>
                 ))
             ) : (
-                <h2 className="">You have to generate board first</h2>
+                <h2 className="text-3xl font-bold">You have to generate board first!</h2>
             )}
         </div>
     );

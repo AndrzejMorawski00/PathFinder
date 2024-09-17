@@ -21,9 +21,12 @@ const Header = () => {
     };
 
     return (
-        <div className="flex flex-row justify-around  py-[1rem] bg-blue-400">
+        <div className="flex flex-row w-full items-center justify-around py-5 px-3 bg-backgroundColor">
             <AlgorithmSelector />
-            <button className="navbarButton" onClick={handleAlgorithmStart}>
+            <button
+                className="border-2  py-1 px-2 border-fontColor font-bold text-xl xl:text-2xl 2xl:text-3xl text-nowrap rounded transition duration-300 hover:bg-fontColor/20"
+                onClick={handleAlgorithmStart}
+            >
                 Start Algorithm
             </button>
         </div>
