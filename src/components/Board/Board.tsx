@@ -25,7 +25,7 @@ const Board = () => {
                     </div>
                 ))
             ) : (
-                <h2 className="text-3xl font-bold">You have to generate board first!</h2>
+                <h2 className="text-3xl font-bold">You have to generate the board first!</h2>
             )}
         </div>
     );

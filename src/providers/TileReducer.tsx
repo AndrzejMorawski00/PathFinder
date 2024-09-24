@@ -9,7 +9,7 @@ const boardReducer = (boardData: BoardType, action: TileReducerAction): BoardTyp
             const { width, height } = action;
             const newBoard = generateNewBoard(width, height);
             return {
-                ...boardData,
+                ...DEFAULT_BOARD,
                 board: newBoard,
             };
         }

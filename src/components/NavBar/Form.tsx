@@ -35,7 +35,6 @@ const Form = () => {
         if (!validateBoardSide(+height, MIN_BOARD_HEIGHT, MAX_BOARD_HEIGHT)) {
             messages.push(`Board height must be in [${MIN_BOARD_HEIGHT},${MAX_BOARD_HEIGHT}] range`);
         }
-
         if (messages.length) {
             printMessages(messages);
         } else {
@@ -82,7 +81,7 @@ const Form = () => {
                 />
             </div>
             <button
-                className="border-2 mx-5 p-1 border-fontColor font-bold text-l xl:text-xl 2xl:text-3x text-nowrap rounded transition duration-300 hover:bg-fontColor/20"
+                className="border-2 mx-5 p-1 border-fontColor font-bold text-l  xl:text-xl 2xl:text-3xl text-nowrap rounded transition duration-300 hover:bg-fontColor/20"
                 onClick={handleFormSubmit}
                 type="submit"
             >
