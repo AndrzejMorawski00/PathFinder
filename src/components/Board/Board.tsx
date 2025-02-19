@@ -12,7 +12,7 @@ const Board = () => {
 
     return (
         <div
-            className="bg-boardBackground flex flex-col items-center justify-center flex-1 w-full h-full"
+            className="flex flex-col items-center justify-center flex-1 w-full h-full bg-boardBackground"
             onMouseDown={() => handleIsMouseDownChange(true)}
             onMouseUp={() => handleIsMouseDownChange(false)}
         >
